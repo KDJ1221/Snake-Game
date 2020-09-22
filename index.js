@@ -1,12 +1,16 @@
 // javascript 
 const grid = document.querySelector('.grid')
 const startButton = document.querySelector('#start')
-const score = document.querySelector('#score')
+const scoreDisplay = document.querySelector('#score')
+let score = 0
 let squares = []
 let currentSnake = [2,1,0]
 let direction = 1
 const width = 10
 let appleIndex = 0
+let intervalTime = 1000
+let speed = 0.9
+let timerId = 0
 
 function createGrid() {
     for (let i=0; i < width*width; i++){
@@ -23,6 +27,21 @@ function createGrid() {
 createGrid()
 
 currentSnake.forEach(index => squares[index].classList.add('snake'))
+
+function startGame(){
+    currentSnake.forEach(index => squares[index].classList.add('snake'))
+    squares[appleIndex].classList.remove('apple')
+    //reset vars 
+    clearInterval(timerId)
+    currentSnake = [2,1,0]
+    score = 0
+    scoreDisplay.textContent = score
+    direction = 1
+    intervalTime = 1000
+    generateApples()
+    currentSnake.forEach(index => squares[index].classList.add('snake'))
+    timerId = setInterval(move, intervalTime)
+}
 
 function move() {
     if (
@@ -46,22 +65,27 @@ function move() {
     // add square in direction headed 
     currentSnake.unshift(currentSnake[0]+direction)
 
-    if(){
+    //if the snake head and the apple are in the same pos
+    if(squares[currentSnake[0]].classList.contains('apple')){
         //remove apple class
-        squares[appleIndex].classList.remove('apple')
+        squares[currentSnake[0]].classList.remove('apple')
         //grow snake by 1
+        squares[tail].classList.add('snake')
         //grow snake array
+        currentSnake.push(tail)
         //generate new apple
+        generateApples()
         //add one to score
+        score++
+        scoreDisplay.textContent = score
         //speed up snake
+        clearInterval(timerId)
+        intervalTime = intervalTime * speed
+        timerId = setInterval(move, intervalTime)
     }
 
     squares[currentSnake[0]].classList.add('snake')
 }
-
-move()
-
-let timerId = setInterval(move, 1000)
 
 function generateApples() {
     do {
@@ -90,3 +114,4 @@ function control(e){
 }
 
 document.addEventListener("keyup", control)
+startButton.addEventListener("click", startGame)
